@@ -72,7 +72,7 @@ class Logger:
                     bot_flag = m["author"]["bot"]
                 except:
                     bot_flag = False
-                command_towrite = 'C' if content in command_list.keys else ''
+                command_towrite = 'C' if content in command_list.keys() else ''
                 mentioned = False
                 for i in m["mentions"]:
                     if self_id == i["id"]:
