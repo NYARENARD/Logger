@@ -106,11 +106,13 @@ class Logger:
                         self.bot.sendMessage(channel, message)
                         for url in attachments:
                             self.bot.sendFile(channel, url, isurl=True)
-                    elif command == "удалить":
+                        return
+                    if command == "удалить":
                         channel = content_arr[1] 
                         msg_id = content_arr[2]
                         self.bot.deleteMessage(channel, msg_id)
-                    elif command == "ответить":
+                        return
+                    if command == "ответить":
                         content_arr = content
                         content_arr.split(' ', 3)
                         channel = content_arr[1] 
@@ -119,9 +121,9 @@ class Logger:
                         self.bot.reply(channel, recipee, message) 
                         for url in attachments:
                             self.bot.sendFile(channel, url, isurl=True)
-                    else:
-                        messageID = m["id"]
-                        self.bot.addReaction(channelID, messageID, '❔') 
+                        return    
+                    messageID = m["id"]
+                    self.bot.addReaction(channelID, messageID, '❔') 
 
         self.bot.gateway.run()
 
