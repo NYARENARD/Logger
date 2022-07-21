@@ -89,6 +89,7 @@ class Logger:
             if resp.event.message:
                 m = resp.parsed.auto()
                 channelID = m["channel_id"]  
+                messageID = m["id"]
                 content = m["content"]
                 self_id = self.bot.gateway.session.user["id"]
                 himself = (m["author"]["id"] == self_id)
@@ -101,25 +102,45 @@ class Logger:
                     command = content_arr[0].lower()
                     if command == "отправить":
                         channel = content_arr[1] 
-                        message = content_arr[2]
-                        self.bot.sendMessage(channel, message)
+                        content = content_arr[2]
+                        time = len(message) / 5 + 1 
+                        self.bot.addReaction(channelID, messageID, '💬') 
+                        Thread(target=imit, args=(channel, time)).start().join()
+                        self.bot.sendMessage(channel, content)
                         for url in attachments:
                             self.bot.sendFile(channel, url, isurl=True)
+                        self.bot.addReaction(channelID, messageID, '✅') 
                     elif command == "удалить":
                         channel = content_arr[1] 
                         msg_id = content_arr[2]
                         self.bot.deleteMessage(channel, msg_id)
+                        self.bot.addReaction(channelID, messageID, '✅') 
                     elif command == "ответить":
                         extra_arr = content_arr[2].split(' ', 1)
                         channel = content_arr[1] 
-                        recipient = extra_arr[0]
-                        message = extra_arr[1]
-                        self.bot.reply(channel, recipient, message) 
+                        msg_to_reply = extra_arr[0]
+                        content = extra_arr[1]
+                        time = len(message) / 5 + 1 
+                        self.bot.addReaction(channelID, messageID, '💬') 
+                        Thread(target=imit, args=(channel, time)).start().join()
+                        self.bot.reply(channel, msg_to_reply, content)
                         for url in attachments:
                             self.bot.sendFile(channel, url, isurl=True) 
+                        self.bot.addReaction(channelID, messageID, '✅') 
+                    elif command == "редактировать":
+                        extra_arr = content_arr[2].split(' ', 1)
+                        channel = content_arr[1] 
+                        msg_to_edit = extra_arr[0]
+                        message = extra_arr[1]
+                        self.bot.editMessage(channel, msg_to_edit, message) 
+                        self.bot.addReaction(channelID, messageID, '✅') 
                     else:
-                        messageID = m["id"]
                         self.bot.addReaction(channelID, messageID, '❔') 
+
+        def imit(channel, time):
+            for counter in range(time):
+                self.bot.typingAction(channel)
+                time.sleep(1)
 
         self.bot.gateway.run()
 
