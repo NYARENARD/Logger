@@ -97,8 +97,7 @@ class Logger:
                     attachments.append(dict['url'])
 
                 if channelID == self._log_channel and not himself:
-                    content_arr = content
-                    content_arr.split(' ', 2)
+                    content_arr = content.split(' ', 2)
                     command = content_arr[0].lower()
                     if command == "отправить":
                         channel = content_arr[1] 
@@ -111,17 +110,16 @@ class Logger:
                         msg_id = content_arr[2]
                         self.bot.deleteMessage(channel, msg_id)
                     elif command == "ответить":
-                        content_arr = content
-                        content_arr.split(' ', 3)
+                        extra_arr = content_arr[2].split(' ', 1)
                         channel = content_arr[1] 
-                        recipient = content_arr[2]
-                        message = content_arr[3]
+                        recipient = extra_arr[0]
+                        message = extra_arr[1]
                         self.bot.reply(channel, recipient, message) 
                         for url in attachments:
                             self.bot.sendFile(channel, url, isurl=True) 
-                    #else:
-                    #    messageID = m["id"]
-                    #    self.bot.addReaction(channelID, messageID, '❔') 
+                    else:
+                        messageID = m["id"]
+                        self.bot.addReaction(channelID, messageID, '❔') 
 
         self.bot.gateway.run()
 
