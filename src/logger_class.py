@@ -90,11 +90,13 @@ class Logger:
                 m = resp.parsed.auto()
                 channelID = m["channel_id"]  
                 content = m["content"]
+                self_id = self.bot.gateway.session.user["id"]
+                himself = (m["author"]["id"] == self_id)
                 attachments = []
                 for dict in m['attachments']:
                     attachments.append(dict['url'])
 
-                if channelID == self._log_channel:
+                if channelID == self._log_channel and not himself:
                     content_arr = content
                     content_arr.split(' ', 2)
                     command = content_arr[0].lower()
