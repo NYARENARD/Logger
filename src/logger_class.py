@@ -108,15 +108,19 @@ class Logger:
                         msg_id = content_arr[2]
                         self.bot.deleteMessage(channel, msg_id)
                     elif command == "ответить":
+                        print("1") 
                         content_arr = content.split(' ', 3) 
+                        print("2") 
                         channel = content_arr[1] 
                         recipee = content_arr[2]
                         message = content_arr[3]
+                        print("3") 
                         self.bot.reply(channel, recipee, message)
+                        print("4") 
                         for url in attachments:
                             self.bot.sendFile(channel, url, isurl=True)
                     else:
-                        messageID = m["message_id"]
+                        messageID = m["id"]
                         self.bot.addReaction(channelID, messageID, '❔')
 
         self.bot.gateway.run()
