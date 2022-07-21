@@ -21,7 +21,7 @@ class Logger:
 	
     def _logging(self, message, attachments):
         print(message)
-        self.bot.sendMessage(self._log_channel, '`' + message + '`')
+        self.bot.sendMessage(self._log_channel, message)
         for url in attachments:
             self.bot.sendFile(self._log_channel, url, isurl=True)
 
@@ -51,10 +51,11 @@ class Logger:
             self._type_send(channelID, ans_gotit)
 
         @self.bot.gateway.command
-        def log(resp):
+        def log_messages(resp):
             if resp.event.message and flag_log_gl:
                 m = resp.parsed.auto()
                 channelID = m["channel_id"]
+                msg_id = m["id"]
                 username = m["author"]["username"]
                 discriminator = m["author"]["discriminator"]
                 self_id = self.bot.gateway.session.user["id"]
@@ -77,9 +78,22 @@ class Logger:
                 mentioned_towrite = 'M' if mentioned else ''
 
                 if not bot_flag and channelID != self._log_channel:
-                    self._logging('> ' + "[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
+                    self._logging("`> " + "[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
                                   "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
-                                  "{}#{}".format(username, discriminator).rjust(21) + ": " + " {}".format(content), attachments)
+                                  "{}".format(msg_id).rjust(18) + " |` " + "{}#{}".format(username, discriminator).rjust(21) + ": " + " {}".format(content), attachments)
+
+        @self.bot.gateway.command
+        def log_delete(resp):
+            if resp.event.message_deleted and flag_log_gl:
+                m = resp.parsed.auto()
+                channelID = m["channel_id"]
+                msg_id = m["id"]
+                if channelID != self._log_channel:
+                    searchResponse = bot.searchMessages(self._log_channel, textSearch=msg_id)
+                    results = bot.filterSearchResults(searchResponse)
+                    print(results)
+                    self._logging("`> " + "{}".format(channelID).rjust(18) + \
+                                  " | " + "{}".format(msg_id).rjust(18) + "` **Deleted**" 
 
         @self.bot.gateway.command
         def read_command(resp):
