@@ -41,19 +41,6 @@ class Logger:
                 flag_log_gl = 0 
             self._type_send(channelID, ans_gotit)
 
-
-        @self.bot.gateway.command
-        def read_command(resp):
-            if resp.event.message:
-                m = resp.parsed.auto()
-                channelID = m["channel_id"]
-                content = m["content"]
-
-                for command in command_list:
-                    if content.lower() == command:
-                        command_handle(command_list[command], channelID)
-                        break
-
         @self.bot.gateway.command
         def log(resp):
             if resp.event.message and flag_log_gl:
@@ -84,6 +71,50 @@ class Logger:
                     self._logging('> ' + "[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
                                   "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
                                   "{}#{}".format(username, discriminator).rjust(21) + ": " + " {}".format(content), attachments)
+
+        @self.bot.gateway.command
+        def read_command(resp):
+            if resp.event.message:
+                m = resp.parsed.auto()
+                channelID = m["channel_id"]
+                content = m["content"]
+
+                for command in command_list:
+                    if content.lower() == command:
+                        command_handle(command_list[command], channelID)
+                        break
+                
+        @self.bot.gateway.command
+        def resend(resp):
+            if resp.event.message:
+                m = resp.parsed.auto()
+                channelID = m["channel_id"]  
+                content = m["content"]
+                attachments = []
+                for dict in m['attachments']:
+                    attachments.append(dict['url'])
+
+                if channelID == self._log_channel:
+                    content_arr = content.split(' ', 2) 
+                    command = content_arr[0].lower()
+                    if command == "отправить":
+                        channel = content_arr[1] 
+                        message = content_arr[2]
+                        self.bot.sendMessage(channel, message)
+                        for url in attachments:
+                            self.bot.sendFile(channel, url, isurl=True)
+                    elif command == "удалить":
+                        channel = content_arr[1] 
+                        msg_id = content_arr[2]
+                        self.bot.deleteMessage(channel, msg_id)
+                    elif command == "ответить":
+                        content_arr = content.split(' ', 3) 
+                        channel = content_arr[1] 
+                        recipee = content_arr[2]
+                        message = content_arr[3]
+                        self.bot.reply(channel, recipee, message)
+                        for url in attachments:
+                            self.bot.sendFile(channel, url, isurl=True)
 
         self.bot.gateway.run()
 
