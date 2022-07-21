@@ -85,7 +85,7 @@ class Logger:
                         break
                 
         @self.bot.gateway.command
-        def resend(resp):
+        def logchannel_commands(resp):
             if resp.event.message:
                 m = resp.parsed.auto()
                 channelID = m["channel_id"]  
@@ -95,7 +95,8 @@ class Logger:
                     attachments.append(dict['url'])
 
                 if channelID == self._log_channel:
-                    content_arr = content.split(' ', 2) 
+                    content_arr = content
+                    content_arr.split(' ', 2)
                     command = content_arr[0].lower()
                     if command == "отправить":
                         channel = content_arr[1] 
@@ -108,20 +109,17 @@ class Logger:
                         msg_id = content_arr[2]
                         self.bot.deleteMessage(channel, msg_id)
                     elif command == "ответить":
-                        print("1") 
-                        content_arr = content.split(' ', 3) 
-                        print("2") 
+                        content_arr = content
+                        content_arr.split(' ', 3)
                         channel = content_arr[1] 
                         recipee = content_arr[2]
                         message = content_arr[3]
-                        print("3") 
-                        self.bot.reply(channel, recipee, message)
-                        print("4") 
+                        self.bot.reply(channel, recipee, message) 
                         for url in attachments:
                             self.bot.sendFile(channel, url, isurl=True)
                     else:
                         messageID = m["id"]
-                        self.bot.addReaction(channelID, messageID, '❔')
+                        self.bot.addReaction(channelID, messageID, '❔') 
 
         self.bot.gateway.run()
 
