@@ -92,9 +92,9 @@ class Logger:
                 if channelID != self._log_channel:
                     searchResponse = self.bot.searchMessages(guildID=self._log_guild, channelID=self._log_channel, textSearch=msg_id)
                     results = self.bot.filterSearchResults(searchResponse)
-                    print(results)
-                    self._logging("`> " + "{}".format(channelID).rjust(18) + \
-                                  " | " + "{}".format(msg_id).rjust(18) + "` **Deleted**", []) 
+                    deleted_msg = results[0]["id"] 
+                    self.bot.reply(self._log_channel, deleted_msg, "`> " + "{}".format(channelID).rjust(18) + \
+                                  " | " + "{}".format(msg_id).rjust(18) + "` ** Deleted**", []) 
 
         @self.bot.gateway.command
         def read_command(resp):
