@@ -94,7 +94,21 @@ class Logger:
                     results = self.bot.filterSearchResults(searchResponse)
                     deleted_msg = results[0]["id"] 
                     self.bot.reply(self._log_channel, deleted_msg, "`> " + "{}".format(channelID).rjust(18) + \
-                                  " | " + "{}".format(msg_id).rjust(18) + "` ** Deleted**", []) 
+                                  " | " + "{}".format(msg_id).rjust(18) + "` ** Deleted**") 
+
+        @self.bot.gateway.command
+        def log_delete(resp):
+            if resp.event.message_updated and flag_log_gl:
+                m = resp.parsed.auto()
+                channelID = m["channel_id"]
+                msg_id = m["id"]
+                content = m["content"]
+                if channelID != self._log_channel:
+                    searchResponse = self.bot.searchMessages(guildID=self._log_guild, channelID=self._log_channel, textSearch=msg_id)
+                    results = self.bot.filterSearchResults(searchResponse)
+                    updated_msg = results[0]["id"] 
+                    self.bot.reply(self._log_channel, updated_msg, "`> " + "{}".format(channelID).rjust(18) + \
+                                  " | " + "{}".format(msg_id).rjust(18) + "` ** Updated**: " + content) 
 
         @self.bot.gateway.command
         def read_command(resp):
