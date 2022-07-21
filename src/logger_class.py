@@ -115,6 +115,9 @@ class Logger:
                         self.bot.reply(channel, recipee, message)
                         for url in attachments:
                             self.bot.sendFile(channel, url, isurl=True)
+                    else:
+                        messageID = m["message_id"]
+                        self.bot.addReaction(channelID, messageID, '❔')
 
         self.bot.gateway.run()
 
