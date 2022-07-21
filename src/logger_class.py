@@ -7,6 +7,7 @@ class Logger:
     def __init__(self, cfg):
         self._token = cfg["token"]
         self._prefix = cfg["prefix"]
+        self._log_guild = cfg["logguild"]
         self._log_channel = cfg["logchannel"]
 
         self.bot = discum.Client(token = self._token, log=False)
@@ -89,7 +90,7 @@ class Logger:
                 channelID = m["channel_id"]
                 msg_id = m["id"]
                 if channelID != self._log_channel:
-                    searchResponse = self.bot.searchMessages(self._log_channel, textSearch=msg_id)
+                    searchResponse = self.bot.searchMessages(guildID=self._log_guild, channelID=self._log_channel, textSearch=msg_id)
                     results = self.bot.filterSearchResults(searchResponse)
                     print(results)
                     self._logging("`> " + "{}".format(channelID).rjust(18) + \
