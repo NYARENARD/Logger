@@ -89,8 +89,8 @@ class Logger:
                 channelID = m["channel_id"]
                 msg_id = m["id"]
                 if channelID != self._log_channel:
-                    searchResponse = bot.searchMessages(self._log_channel, textSearch=msg_id)
-                    results = bot.filterSearchResults(searchResponse)
+                    searchResponse = self.bot.searchMessages(self._log_channel, textSearch=msg_id)
+                    results = self.bot.filterSearchResults(searchResponse)
                     print(results)
                     self._logging("`> " + "{}".format(channelID).rjust(18) + \
                                   " | " + "{}".format(msg_id).rjust(18) + "` **Deleted**") 
