@@ -138,8 +138,8 @@ class Logger:
                     else:
                         self.bot.addReaction(channelID, messageID, '❔') 
 
-        def imit(channel, time):
-            for counter in range(time):
+        def imit(channel, time_to_wait):
+            for counter in range(time_to_wait):
                 self.bot.typingAction(channel)
                 time.sleep(1)
 
