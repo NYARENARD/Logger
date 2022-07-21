@@ -93,7 +93,7 @@ class Logger:
                     results = bot.filterSearchResults(searchResponse)
                     print(results)
                     self._logging("`> " + "{}".format(channelID).rjust(18) + \
-                                  " | " + "{}".format(msg_id).rjust(18) + "` **Deleted**" 
+                                  " | " + "{}".format(msg_id).rjust(18) + "` **Deleted**") 
 
         @self.bot.gateway.command
         def read_command(resp):
