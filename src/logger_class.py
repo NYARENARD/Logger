@@ -29,17 +29,25 @@ class Logger:
     def _commands_launch(self):
 
         command_list = {self._prefix + "логировать" : ["логировать", "Логирую"],\
-                        self._prefix + "нелогировать" : ["нелогировать", "Принял."]}
+                        self._prefix + "нелогировать" : ["нелогировать", "Не логирую."],\
+                        self._prefix + "разрешить" : ["разрешить", "Разрешил."],\
+                        self._prefix + "запретить" : ["запретить", "Запретил."]}
         flag_log_gl = 1
+        flag_permission_gl = 1
 
         def command_handle(config, channelID):
             command_name = config[0]
             ans_gotit = config[1]
             nonlocal flag_log_gl
+            nonlocal flag_permission_gl
             if command_name == "логировать":
                 flag_log_gl = 1
             elif command_name == "нелогировать":
                 flag_log_gl = 0 
+            elif command_name == "разрешить":
+                flag_permission_gl = 1
+            elif command_name == "запретить":
+                flag_permission_gl = 0  
             self._type_send(channelID, ans_gotit)
 
         @self.bot.gateway.command
@@ -98,7 +106,7 @@ class Logger:
                 for dict in m['attachments']:
                     attachments.append(dict['url'])
 
-                if channelID == self._log_channel and not himself:
+                if channelID == self._log_channel and flag_permission_gl and not himself:
                     content_arr = content.split(' ', 2)
                     command = content_arr[0].lower()
                     if command == "отправить":
