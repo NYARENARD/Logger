@@ -106,7 +106,9 @@ class Logger:
                         content = content_arr[2]
                         time = len(content) // 5 + 1 
                         self.bot.addReaction(channelID, messageID, '💬') 
-                        Thread(target=imit, args=(channel, time)).start().join()
+                        t = Thread(target=imit, args=(channel, time))
+                        t.start()
+                        t.join()
                         self.bot.sendMessage(channel, content)
                         for url in attachments:
                             self.bot.sendFile(channel, url, isurl=True)
@@ -123,7 +125,9 @@ class Logger:
                         content = extra_arr[1]
                         time = len(content) // 5 + 1 
                         self.bot.addReaction(channelID, messageID, '💬') 
-                        Thread(target=imit, args=(channel, time)).start().join()
+                        t = Thread(target=imit, args=(channel, time))
+                        t.start()
+                        t.join()
                         self.bot.reply(channel, msg_to_reply, content)
                         for url in attachments:
                             self.bot.sendFile(channel, url, isurl=True) 
