@@ -121,7 +121,7 @@ class Logger:
                 for dict in m['attachments']:
                     attachments.append(dict['url'])
 
-                if channelID == self._log_channel and flag_permission_gl and not himself:
+                if channelID == self._log_channel and flag_permission_gl:
                     content_arr = content.split(' ', 2)
                     command = content_arr[0].lower()
                     if command == "отправить":
