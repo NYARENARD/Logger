@@ -1,5 +1,6 @@
 import discum
 from threading import Thread
+import time
 
 class Logger:
     
@@ -103,7 +104,7 @@ class Logger:
                     if command == "отправить":
                         channel = content_arr[1] 
                         content = content_arr[2]
-                        time = len(message) / 5 + 1 
+                        time = len(content) / 5 + 1 
                         self.bot.addReaction(channelID, messageID, '💬') 
                         Thread(target=imit, args=(channel, time)).start().join()
                         self.bot.sendMessage(channel, content)
@@ -120,7 +121,7 @@ class Logger:
                         channel = content_arr[1] 
                         msg_to_reply = extra_arr[0]
                         content = extra_arr[1]
-                        time = len(message) / 5 + 1 
+                        time = len(content) / 5 + 1 
                         self.bot.addReaction(channelID, messageID, '💬') 
                         Thread(target=imit, args=(channel, time)).start().join()
                         self.bot.reply(channel, msg_to_reply, content)
