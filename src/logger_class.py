@@ -81,7 +81,7 @@ class Logger:
                 if not bot_flag and channelID != self._log_channel:
                     self._logging("`> " + "[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
                                   "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
-                                  "{}".format(msg_id).rjust(18) + " |` " + "{}#{}".format(username, discriminator).rjust(21) + ": " + " {}".format(content), attachments)
+                                  "{}".format(msg_id).rjust(18) + " | `" + "{}#{}".format(username, discriminator).rjust(21) + ": " + " {}".format(content), attachments)
 
         @self.bot.gateway.command
         def log_delete(resp):
@@ -162,7 +162,7 @@ class Logger:
                         message = extra_arr[1]
                         self.bot.editMessage(channel, msg_to_edit, message) 
                         self.bot.addReaction(channelID, messageID, '✅') 
-                    else:
+                    elif not himself:
                         self.bot.addReaction(channelID, messageID, '❔') 
 
         def imit(channel, time_to_wait):
