@@ -169,7 +169,7 @@ class Logger:
                             ref_arr = m["referenced_message"]["content"].split(' ', 9)
                             channel = ref_arr[2]
                             msg_to_reply = ref_arr[7] 
-                            content = ref_arr[9] 
+                            content = content_arr[1] 
                         else:
                             extra_arr = content_arr[2].split(' ', 1)
                             channel = content_arr[1] 
