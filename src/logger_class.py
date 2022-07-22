@@ -165,10 +165,16 @@ class Logger:
                         self.bot.deleteMessage(channel, msg_id)
                         self.bot.addReaction(channelID, messageID, '✅') 
                     elif command == "ответить":
-                        extra_arr = content_arr[2].split(' ', 1)
-                        channel = content_arr[1] 
-                        msg_to_reply = extra_arr[0]
-                        content = extra_arr[1]
+                        if m["referenced_message"] != None:
+                            ref_arr = m["referenced_message"]["content"].split(' ', 9)
+                            channel = ref_arr[2]
+                            msg_to_reply = ref_arr[7] 
+                            content = ref_arr[9] 
+                        else:
+                            extra_arr = content_arr[2].split(' ', 1)
+                            channel = content_arr[1] 
+                            msg_to_reply = extra_arr[0]
+                            content = extra_arr[1]
                         time_to_wait = len(content) // 5 + 1 
                         self.bot.addReaction(channelID, messageID, '💬') 
                         t = Thread(target=imit, args=(channel, time_to_wait))
