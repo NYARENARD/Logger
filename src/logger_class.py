@@ -105,7 +105,7 @@ class Logger:
                                   " | " + "{}".format(msg_id).rjust(18) + "` ** Deleted**") 
 
         @self.bot.gateway.command
-        def log_delete(resp):
+        def log_update(resp):
             if resp.event.message_updated and flag_log_gl:
                 m = resp.parsed.auto()
                 channelID = m["channel_id"]
@@ -146,12 +146,13 @@ class Logger:
                 if channelID == self._log_channel and flag_permission_gl:
                     content_arr = content.split(' ', 2)
                     command = content_arr[0].lower()
+                    
                     if command == "отправить":
                         channel = content_arr[1] 
                         content = content_arr[2]
-                        time = len(content) // 5 + 1 
+                        time_to_wait = len(content) // 5 + 1 
                         self.bot.addReaction(channelID, messageID, '💬') 
-                        t = Thread(target=imit, args=(channel, time))
+                        t = Thread(target=imit, args=(channel, time_to_wait))
                         t.start()
                         t.join()
                         self.bot.sendMessage(channel, content)
@@ -168,9 +169,9 @@ class Logger:
                         channel = content_arr[1] 
                         msg_to_reply = extra_arr[0]
                         content = extra_arr[1]
-                        time = len(content) // 5 + 1 
+                        time_to_wait = len(content) // 5 + 1 
                         self.bot.addReaction(channelID, messageID, '💬') 
-                        t = Thread(target=imit, args=(channel, time))
+                        t = Thread(target=imit, args=(channel, time_to_wait))
                         t.start()
                         t.join()
                         self.bot.reply(channel, msg_to_reply, content)
