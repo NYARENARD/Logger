@@ -85,11 +85,11 @@ class Logger:
                         ref_msg = results[0]["id"] 
                         self.bot.reply(self._log_channel, ref_msg, "`> " + "[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
                                   "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
-                                  "{}".format(msg_id).rjust(18) + " | `" + "{}#{}".format(username, discriminator).rjust(21) + " **Replied**: " + " {}".format(content))
+                                  "{}".format(msg_id).rjust(18) + " | `" + "{}#{}".format(username, discriminator).rjust(21) + " **Replied**: `" + " {}`".format(content))
                     else:
                         self._logging("`> " + "[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
                                   "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
-                                  "{}".format(msg_id).rjust(18) + " | `" + "{}#{}".format(username, discriminator).rjust(21) + ": " + " {}".format(content), attachments)
+                                  "{}".format(msg_id).rjust(18) + " | " + "{}#{}".format(username, discriminator).rjust(21) + ": " + " {}`".format(content), attachments)
 
         @self.bot.gateway.command
         def log_delete(resp):
@@ -116,7 +116,7 @@ class Logger:
                     results = self.bot.filterSearchResults(searchResponse)
                     updated_msg = results[0]["id"] 
                     self.bot.reply(self._log_channel, updated_msg, "`> " + "{}".format(channelID).rjust(18) + \
-                                  " | " + "{}".format(msg_id).rjust(18) + "` ** Updated**: " + content) 
+                                  " | " + "{}".format(msg_id).rjust(18) + "` ** Updated**: `" + content + '`') 
 
         @self.bot.gateway.command
         def read_command(resp):
