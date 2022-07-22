@@ -79,7 +79,15 @@ class Logger:
                 mentioned_towrite = 'M' if mentioned else ''
 
                 if not bot_flag and channelID != self._log_channel:
-                    self._logging("`> " + "[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
+                    if m["referenced_message"] != None:
+                        searchResponse = self.bot.searchMessages(guildID=self._log_guild, channelID=self._log_channel, textSearch=m["referenced_message"]["id"])
+                        results = self.bot.filterSearchResults(searchResponse)
+                        ref_msg = results[0]["id"] 
+                        self.reply(self._log_channel, ref_msg, "`> " + "[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
+                                  "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
+                                  "{}".format(msg_id).rjust(18) + " | `" + "{}#{}".format(username, discriminator).rjust(21) + " **Replied**: " + " {}".format(content))
+                    else:
+                        self._logging("`> " + "[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
                                   "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
                                   "{}".format(msg_id).rjust(18) + " | `" + "{}#{}".format(username, discriminator).rjust(21) + ": " + " {}".format(content), attachments)
 
