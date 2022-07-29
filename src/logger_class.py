@@ -13,7 +13,7 @@ class Logger:
         self.bot = discum.Client(token = self._token, log=False)
         self._thread = Thread(target=self._commands_launch)
         self._thread.start()
-        self._logging("`>>> Подключение успешно.`", [])
+        #self._logging("`>>> Подключение успешно.`", [])
 
     def __del__(self):
         self.bot.gateway.close()
