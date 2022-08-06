@@ -86,6 +86,8 @@ class Logger:
                         self.bot.reply(self._log_channel, ref_msg, "`> " + "[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
                                   "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
                                   "{}".format(msg_id).rjust(18) + " | " + "{}#{}".format(username, discriminator).rjust(21) + "` **Replied**: `" + " {}`".format(content))
+                        for url in attachments:
+                            self.bot.sendFile(self._log_channel, url, isurl=True)
                     else:
                         self._logging("`> " + "[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
                                   "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
