@@ -188,11 +188,8 @@ class Logger(Thread):
                         if m["referenced_message"] != None:
                             ref_arr = m["referenced_message"]["content"].split(' ', 10)
                             channel = ref_arr[2]
-                            print(channel, ' ')
-                            msg_id = ref_arr[9]
-                            print(msg_id)							
-                            content = content_arr[1]
-                            print(content)
+                            msg_id = ref_arr[9]							
+                            content = content_arr[1] + ' ' + content_arr[2]
                         else:
                             extra_arr = content_arr[2].split(' ', 1)
                             channel = content_arr[1] 
@@ -212,7 +209,7 @@ class Logger(Thread):
                             ref_arr = m["referenced_message"]["content"].split(' ', 10)
                             channel = ref_arr[2]
                             msg_id = ref_arr[9]
-                            content = content_arr[1]
+                            content = content_arr[1] + ' ' + content_arr[2]
                         else:
                             extra_arr = content_arr[2].split(' ', 1)
                             channel = content_arr[1] 
