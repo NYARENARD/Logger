@@ -14,7 +14,6 @@ class Logger(threading.Thread):
 
     def __del__(self):
         self.bot.gateway.close()
-        self._thread.join()
         self._logging("`>>> Соединение сброшено.`", [])
 	
     def run(self):
