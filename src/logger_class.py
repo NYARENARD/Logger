@@ -93,7 +93,7 @@ class Logger(Thread):
                               "{}".format(msg_id).rjust(18) + " | `||`" + "{}#{}".format(username, discriminator).rjust(21) + \
                               "` **Replied**: `" + " {}`".format(content)
                     if m["referenced_message"] != None:
-                        searchResponse = self.bot.searchMessages(guildID=self._log_guild, channelID=self._log_channel, textSearch=m["referenced_message"]["id"])
+                        searchResponse = self.bot.searchMessages(channelID=self._log_channel, textSearch=m["referenced_message"]["id"])
                         results = self.bot.filterSearchResults(searchResponse)
                         try:
                             ref_msg = results[0]["id"]							
@@ -118,7 +118,7 @@ class Logger(Thread):
                 if channelID != self._log_channel:
                     payload = "`DEL " + "`||`{}".format(channelID).rjust(18) + \
                               " | " + "{}".format(msg_id).rjust(18) + "`|| ** Deleted**"
-                    searchResponse = self.bot.searchMessages(guildID=self._log_guild, channelID=self._log_channel, textSearch=msg_id)
+                    searchResponse = self.bot.searchMessages(channelID=self._log_channel, textSearch=msg_id)
                     results = self.bot.filterSearchResults(searchResponse)
                     try:
                         deleted_msg = results[0]["id"] 
@@ -136,7 +136,7 @@ class Logger(Thread):
                 if channelID != self._log_channel:
                     payload = "`UPD " + "`||`{}".format(channelID).rjust(18) + \
                               " | " + "{}".format(msg_id).rjust(18) + "`|| ** Updated**: `" + content + '`'
-                    searchResponse = self.bot.searchMessages(guildID=self._log_guild, channelID=self._log_channel, textSearch=msg_id)
+                    searchResponse = self.bot.searchMessages(channelID=self._log_channel, textSearch=msg_id)
                     results = self.bot.filterSearchResults(searchResponse)
                     try:
                         updated_msg = results[0]["id"] 
