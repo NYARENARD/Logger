@@ -89,20 +89,23 @@ class Logger(threading.Thread):
                 mentioned_towrite = 'M' if mentioned else ''
 
                 if not bot_flag and channelID != self._log_channel:
+                    replied_flag = "` **Replied**: `"
                     payload = "`MSG " + "`||`[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
                               "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
-                              "{}".format(msg_id).rjust(18) + " | `||`" + "{}#{}".format(username, discriminator).rjust(21) + "` **Replied**: `" + " {}`".format(content)
+                              "{}".format(msg_id).rjust(18) + " | `||`" + "{}#{}".format(username, discriminator).rjust(21) + \
+                              "{}".format(replied_flag) + " {}`".format(content)
                     if m["referenced_message"] != None:
                         searchResponse = self.bot.searchMessages(guildID=self._log_guild, channelID=self._log_channel, textSearch=m["referenced_message"]["id"])
                         results = self.bot.filterSearchResults(searchResponse)
                         try:
-                            ref_msg = results[0]["id"] 
+                            ref_msg = results[0]["id"]							
                             self.bot.reply(self._log_channel, ref_msg, payload)
                             for url in attachments:
                                 self.bot.sendFile(self._log_channel, url, isurl=True)
                         except:
                             self._logging(payload, attachments)   
                     else:
+                        replied_flag = ": "
                         self._logging(payload, attachments)
 
         @self.bot.gateway.command
