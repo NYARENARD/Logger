@@ -52,11 +52,12 @@ class Logger(Thread):
             if resp.event.message:
                 m = resp.parsed.auto()
                 channelID = m["channel_id"]
+                messageID = m["id"]
                 content = m["content"]
 
                 for command in command_list:
                     if content.lower() == self._prefix + command:
-                        command_handle(command_list[command], channelID)
+                        command_handle(command_list[command], channelID, messageID)
                         return
 
         @self.bot.gateway.command
