@@ -8,7 +8,6 @@ class Logger(Thread):
         Thread.__init__(self)
         self._token = cfg["token"]
         self._prefix = cfg["prefix"]
-        self._log_guild = cfg["logguild"]
         self._log_channel = cfg["logchannel"]
         self.bot = discum.Client(token = self._token, log=False)
 
