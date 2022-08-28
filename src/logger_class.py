@@ -193,9 +193,7 @@ class Logger:
                         message = extra_arr[1]
                         self.bot.editMessage(channel, msg_to_edit, message) 
                         self.bot.addReaction(channelID, messageID, '✅') 
-                    elif not himself:
-                        self.bot.addReaction(channelID, messageID, '❔') 
-
+                    
         def imit(channel, time_to_wait):
             for counter in range(time_to_wait):
                 self.bot.typingAction(channel)
