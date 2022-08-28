@@ -89,11 +89,10 @@ class Logger(threading.Thread):
                 mentioned_towrite = 'M' if mentioned else ''
 
                 if not bot_flag and channelID != self._log_channel:
-                    replied_flag = "` **Replied**: `"
                     payload = "`MSG " + "`||`[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
                               "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
                               "{}".format(msg_id).rjust(18) + " | `||`" + "{}#{}".format(username, discriminator).rjust(21) + \
-                              "{}".format(replied_flag) + " {}`".format(content)
+                              "` **Replied**: `" + " {}`".format(content)
                     if m["referenced_message"] != None:
                         searchResponse = self.bot.searchMessages(guildID=self._log_guild, channelID=self._log_channel, textSearch=m["referenced_message"]["id"])
                         results = self.bot.filterSearchResults(searchResponse)
@@ -105,7 +104,10 @@ class Logger(threading.Thread):
                         except:
                             self._logging(payload, attachments)   
                     else:
-                        replied_flag = ": "
+                        payload = "`MSG " + "`||`[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
+                                  "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
+                                  "{}".format(msg_id).rjust(18) + " | `||`" + "{}#{}".format(username, discriminator).rjust(21) + \
+                                  ": " + " {}`".format(content)
                         self._logging(payload, attachments)
 
         @self.bot.gateway.command
