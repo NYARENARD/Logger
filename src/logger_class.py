@@ -13,7 +13,7 @@ class Logger(Thread):
 
     def __del__(self):
         self.bot.gateway.close()
-        self._logging("`>>> Соединение сброшено.`", [])
+        self._logging("`>>> Соединение логгера сброшено.`", [])
 	
     def run(self):
         self._logger_launch()
@@ -178,7 +178,7 @@ class Logger(Thread):
                         if m["referenced_message"] != None:
                             ref_arr = m["referenced_message"]["content"].split(' ', 9)
                             channel = ref_arr[2]
-                            msg_id = ref_arr[7] 
+                            msg_id = ref_arr[9] 
                         else:
                             channel = content_arr[1] 
                             msg_id = content_arr[2]
@@ -189,7 +189,7 @@ class Logger(Thread):
                             ref_arr = m["referenced_message"]["content"].split(' ', 9)
                             channel = ref_arr[2]
                             print(channel, ' ')
-                            msg_id = ref_arr[7]
+                            msg_id = ref_arr[9]
                             print(msg_id)							
                             content = content_arr[1]
                             print(content)
@@ -211,7 +211,7 @@ class Logger(Thread):
                         if m["referenced_message"] != None:
                             ref_arr = m["referenced_message"]["content"].split(' ', 9)
                             channel = ref_arr[2]
-                            msg_id = ref_arr[7]
+                            msg_id = ref_arr[9]
                             content = content_arr[1]
                         else:
                             extra_arr = content_arr[2].split(' ', 1)
