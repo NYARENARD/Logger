@@ -176,7 +176,7 @@ class Logger(Thread):
                         self.bot.addReaction(channelID, messageID, '✅') 
                     elif command == "удалить":
                         if m["referenced_message"] != None:
-                            ref_arr = m["referenced_message"]["content"].split(' ', 9)
+                            ref_arr = m["referenced_message"]["content"].split(' ', 10)
                             channel = ref_arr[2]
                             msg_id = ref_arr[9] 
                         else:
@@ -186,7 +186,7 @@ class Logger(Thread):
                         self.bot.addReaction(channelID, messageID, '✅') 
                     elif command == "ответить":
                         if m["referenced_message"] != None:
-                            ref_arr = m["referenced_message"]["content"].split(' ', 9)
+                            ref_arr = m["referenced_message"]["content"].split(' ', 10)
                             channel = ref_arr[2]
                             print(channel, ' ')
                             msg_id = ref_arr[9]
@@ -209,7 +209,7 @@ class Logger(Thread):
                         self.bot.addReaction(channelID, messageID, '✅') 
                     elif command == "редактировать":
                         if m["referenced_message"] != None:
-                            ref_arr = m["referenced_message"]["content"].split(' ', 9)
+                            ref_arr = m["referenced_message"]["content"].split(' ', 10)
                             channel = ref_arr[2]
                             msg_id = ref_arr[9]
                             content = content_arr[1]
