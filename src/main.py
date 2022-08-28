@@ -3,5 +3,6 @@ from logger_class import Logger
 
 def main():
     instance = Logger(class_vars)
+    instance.start()
 
 main()

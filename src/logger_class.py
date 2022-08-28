@@ -1,25 +1,25 @@
+import threading
 import discum
 from threading import Thread
 import time
 
-class Logger:
+class Logger(threading.Thread):
     
     def __init__(self, cfg):
         self._token = cfg["token"]
         self._prefix = cfg["prefix"]
         self._log_guild = cfg["logguild"]
         self._log_channel = cfg["logchannel"]
-
         self.bot = discum.Client(token = self._token, log=False)
-        self._thread = Thread(target=self._commands_launch)
-        self._thread.start()
-        #self._logging("`>>> Подключение успешно.`", [])
 
     def __del__(self):
         self.bot.gateway.close()
         self._thread.join()
         self._logging("`>>> Соединение сброшено.`", [])
 	
+    def run(self):
+        self._logger_launch()
+
     def _logging(self, message, attachments):
         print(message)
         self.bot.sendMessage(self._log_channel, message)
@@ -27,18 +27,13 @@ class Logger:
             self.bot.sendFile(self._log_channel, url, isurl=True)
 
     
-    def _commands_launch(self):
+    def _logger_launch(self):
 
-        command_list = {self._prefix + "логировать" : ["логировать", "Логирую"],\
-                        self._prefix + "нелогировать" : ["нелогировать", "Не логирую."],\
-                        self._prefix + "разрешить" : ["разрешить", "Разрешил."],\
-                        self._prefix + "запретить" : ["запретить", "Запретил."]}
+        command_list = ["логировать", "нелогировать", "разрешить", "запретить"]
         flag_log_gl = 1
         flag_permission_gl = 1
 
-        def command_handle(config, channelID):
-            command_name = config[0]
-            ans_gotit = config[1]
+        def command_handle(command_name, channelID, messageID):
             nonlocal flag_log_gl
             nonlocal flag_permission_gl
             if command_name == "логировать":
@@ -49,7 +44,22 @@ class Logger:
                 flag_permission_gl = 1
             elif command_name == "запретить":
                 flag_permission_gl = 0  
-            self._type_send(channelID, ans_gotit)
+            else:
+                self.bot.addReaction(channelID, messageID, '❔')
+                return
+            self.bot.addReaction(channelID, messageID, '✅')
+
+        @self.bot.gateway.command
+        def read_command(resp):
+            if resp.event.message:
+                m = resp.parsed.auto()
+                channelID = m["channel_id"]
+                content = m["content"]
+
+                for command in command_list:
+                    if content.lower() == self._prefix + command:
+                        command_handle(command_list[command], channelID)
+                        return
 
         @self.bot.gateway.command
         def log_messages(resp):
@@ -70,7 +80,7 @@ class Logger:
                     bot_flag = m["author"]["bot"]
                 except:
                     bot_flag = False
-                command_towrite = 'C' if content in command_list.keys() else ''
+                command_towrite = 'C' if self._prefix + content in command_list else ''
                 mentioned = False
                 for i in m["mentions"]:
                     if self_id == i["id"]:
@@ -79,19 +89,21 @@ class Logger:
                 mentioned_towrite = 'M' if mentioned else ''
 
                 if not bot_flag and channelID != self._log_channel:
+                    payload = "`MSG " + "`||`[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
+                              "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
+                              "{}".format(msg_id).rjust(18) + " | `||`" + "{}#{}".format(username, discriminator).rjust(21) + "` **Replied**: `" + " {}`".format(content)
                     if m["referenced_message"] != None:
                         searchResponse = self.bot.searchMessages(guildID=self._log_guild, channelID=self._log_channel, textSearch=m["referenced_message"]["id"])
                         results = self.bot.filterSearchResults(searchResponse)
-                        ref_msg = results[0]["id"] 
-                        self.bot.reply(self._log_channel, ref_msg, "`> " + "[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
-                                  "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
-                                  "{}".format(msg_id).rjust(18) + " | " + "{}#{}".format(username, discriminator).rjust(21) + "` **Replied**: `" + " {}`".format(content))
-                        for url in attachments:
-                            self.bot.sendFile(self._log_channel, url, isurl=True)
+                        try:
+                            ref_msg = results[0]["id"] 
+                            self.bot.reply(self._log_channel, ref_msg, payload)
+                            for url in attachments:
+                                self.bot.sendFile(self._log_channel, url, isurl=True)
+                        except:
+                            self._logging(payload, attachments)   
                     else:
-                        self._logging("`> " + "[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
-                                  "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
-                                  "{}".format(msg_id).rjust(18) + " | " + "{}#{}".format(username, discriminator).rjust(21) + ": " + " {}`".format(content), attachments)
+                        self._logging(payload, attachments)
 
         @self.bot.gateway.command
         def log_delete(resp):
@@ -100,11 +112,15 @@ class Logger:
                 channelID = m["channel_id"]
                 msg_id = m["id"]
                 if channelID != self._log_channel:
+                    payload = "`DEL " + "`||`{}".format(channelID).rjust(18) + \
+                              " | " + "{}".format(msg_id).rjust(18) + "`|| ** Deleted**"
                     searchResponse = self.bot.searchMessages(guildID=self._log_guild, channelID=self._log_channel, textSearch=msg_id)
                     results = self.bot.filterSearchResults(searchResponse)
-                    deleted_msg = results[0]["id"] 
-                    self.bot.reply(self._log_channel, deleted_msg, "`> " + "{}".format(channelID).rjust(18) + \
-                                  " | " + "{}".format(msg_id).rjust(18) + "` ** Deleted**") 
+                    try:
+                        deleted_msg = results[0]["id"] 
+                        self.bot.reply(self._log_channel, deleted_msg, payload) 
+                    except:
+                        self._logging(payload, [])
 
         @self.bot.gateway.command
         def log_update(resp):
@@ -114,23 +130,16 @@ class Logger:
                 msg_id = m["id"]
                 content = m["content"]
                 if channelID != self._log_channel:
+                    payload = "`UPD " + "`||`{}".format(channelID).rjust(18) + \
+                              " | " + "{}".format(msg_id).rjust(18) + "`|| ** Updated**: `" + content + '`'
                     searchResponse = self.bot.searchMessages(guildID=self._log_guild, channelID=self._log_channel, textSearch=msg_id)
                     results = self.bot.filterSearchResults(searchResponse)
-                    updated_msg = results[0]["id"] 
-                    self.bot.reply(self._log_channel, updated_msg, "`> " + "{}".format(channelID).rjust(18) + \
-                                  " | " + "{}".format(msg_id).rjust(18) + "` ** Updated**: `" + content + '`') 
+                    try:
+                        updated_msg = results[0]["id"] 
+                        self.bot.reply(self._log_channel, updated_msg, payload) 
+                    except:
+                        self._logging(payload, [])
 
-        @self.bot.gateway.command
-        def read_command(resp):
-            if resp.event.message:
-                m = resp.parsed.auto()
-                channelID = m["channel_id"]
-                content = m["content"]
-
-                for command in command_list:
-                    if content.lower() == command:
-                        command_handle(command_list[command], channelID)
-                        break
                 
         @self.bot.gateway.command
         def logchannel_commands(resp):
@@ -162,36 +171,47 @@ class Logger:
                             self.bot.sendFile(channel, url, isurl=True)
                         self.bot.addReaction(channelID, messageID, '✅') 
                     elif command == "удалить":
-                        channel = content_arr[1] 
-                        msg_id = content_arr[2]
+                        if m["referenced_message"] != None:
+                            ref_arr = m["referenced_message"]["content"].split(' ', 9)
+                            channel = ref_arr[2]
+                            msg_id = ref_arr[7] 
+                        else:
+                            channel = content_arr[1] 
+                            msg_id = content_arr[2]
                         self.bot.deleteMessage(channel, msg_id)
                         self.bot.addReaction(channelID, messageID, '✅') 
                     elif command == "ответить":
                         if m["referenced_message"] != None:
                             ref_arr = m["referenced_message"]["content"].split(' ', 9)
                             channel = ref_arr[2]
-                            msg_to_reply = ref_arr[7] 
+                            msg_id = ref_arr[7] 
                             content = content_arr[1] 
                         else:
                             extra_arr = content_arr[2].split(' ', 1)
                             channel = content_arr[1] 
-                            msg_to_reply = extra_arr[0]
+                            msg_id = extra_arr[0]
                             content = extra_arr[1]
                         time_to_wait = len(content) // 5 + 1 
                         self.bot.addReaction(channelID, messageID, '💬') 
                         t = Thread(target=imit, args=(channel, time_to_wait))
                         t.start()
                         t.join()
-                        self.bot.reply(channel, msg_to_reply, content)
+                        self.bot.reply(channel, msg_id, content)
                         for url in attachments:
                             self.bot.sendFile(channel, url, isurl=True) 
                         self.bot.addReaction(channelID, messageID, '✅') 
                     elif command == "редактировать":
-                        extra_arr = content_arr[2].split(' ', 1)
-                        channel = content_arr[1] 
-                        msg_to_edit = extra_arr[0]
-                        message = extra_arr[1]
-                        self.bot.editMessage(channel, msg_to_edit, message) 
+                        if m["referenced_message"] != None:
+                            ref_arr = m["referenced_message"]["content"].split(' ', 9)
+                            channel = ref_arr[2]
+                            msg_id = ref_arr[7]
+                            content = content_arr[1]
+                        else:
+                            extra_arr = content_arr[2].split(' ', 1)
+                            channel = content_arr[1] 
+                            msg_id = extra_arr[0]
+                            message = extra_arr[1]
+                        self.bot.editMessage(channel, msg_id, message) 
                         self.bot.addReaction(channelID, messageID, '✅') 
                     
         def imit(channel, time_to_wait):
