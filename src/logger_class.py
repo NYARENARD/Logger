@@ -6,6 +6,7 @@ import time
 class Logger(threading.Thread):
     
     def __init__(self, cfg):
+        threading.Thread.__init__(self)
         self._token = cfg["token"]
         self._prefix = cfg["prefix"]
         self._log_guild = cfg["logguild"]
