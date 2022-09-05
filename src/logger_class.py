@@ -13,15 +13,21 @@ class Logger(Thread):
 
     def __del__(self):
         self.bot.gateway.close()
-        self._logging("`>>> Соединение логгера сброшено.`", [])
+        self._logging("msg", "`>>> Соединение логгера сброшено.`")
 	
     def run(self):
         self._logger_launch()
 
-    def _logging(self, message, attachments):
-        print(message)
-        self.bot.sendMessage(self._log_channel, message)
+    def _logging(self, type, content, attachments = [], reference = ""):
+        print(content)
+        time.sleep(1)
+        if type == "msg":
+            self.bot.sendMessage(self._log_channel, content)
+        elif type == "rpl":
+            self.bot.reply(self._log_channel, reference, content)
         for url in attachments:
+            payload = "`URL:  " + "{}`".format(url)
+            self.bot.sendMessage(self._log_channel, payload)
             self.bot.sendFile(self._log_channel, url, isurl=True)
 
     
@@ -89,25 +95,23 @@ class Logger(Thread):
 
                 if not bot_flag and channelID != self._log_channel:
                     payload = "`MSG " + "`||`[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
-                              "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
+                              "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(22) + " | " + \
                               "{}".format(msg_id).rjust(18) + " | `||`" + "{}#{}".format(username, discriminator).rjust(21) + \
                               "` **Replied**: `" + " {}`".format(content)
                     if m["referenced_message"] != None:
                         searchResponse = self.bot.searchMessages(channelID=self._log_channel, textSearch=m["referenced_message"]["id"])
                         results = self.bot.filterSearchResults(searchResponse)
                         try:
-                            ref_msg = results[0]["id"]							
-                            self.bot.reply(self._log_channel, ref_msg, payload)
-                            for url in attachments:
-                                self.bot.sendFile(self._log_channel, url, isurl=True)
+                            ref_msg = results[0]["id"]
+                            self._logging("rpl", payload, attachments, ref_msg)							
                         except:
-                            self._logging(payload, attachments)   
+                            self._logging("msg", payload, attachments)   
                     else:
                         payload = "`MSG " + "`||`[{}{}]".format(command_towrite, mentioned_towrite).rjust(4) + ' ' + \
-                                  "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(23) + " | " + \
+                                  "{}".format(channelID).rjust(18) + " | " + "{}".format(timestamp).rjust(22) + " | " + \
                                   "{}".format(msg_id).rjust(18) + " | `||`" + "{}#{}".format(username, discriminator).rjust(21) + \
                                   ": " + " {}`".format(content)
-                        self._logging(payload, attachments)
+                        self._logging("msg", payload, attachments)
 
         @self.bot.gateway.command
         def log_delete(resp):
@@ -122,9 +126,9 @@ class Logger(Thread):
                     results = self.bot.filterSearchResults(searchResponse)
                     try:
                         deleted_msg = results[0]["id"] 
-                        self.bot.reply(self._log_channel, deleted_msg, payload) 
+                        self._logging("rpl", payload, reference=deleted_msg) 
                     except:
-                        self._logging(payload, [])
+                        self._logging("msg", payload)
 
         @self.bot.gateway.command
         def log_update(resp):
@@ -140,9 +144,9 @@ class Logger(Thread):
                     results = self.bot.filterSearchResults(searchResponse)
                     try:
                         updated_msg = results[0]["id"] 
-                        self.bot.reply(self._log_channel, updated_msg, payload) 
+                        self._logging("rpl", payload, reference=updated_msg) 
                     except:
-                        self._logging(payload, [])
+                        self._logging("msg", payload)
 
                 
         @self.bot.gateway.command
@@ -167,7 +171,7 @@ class Logger(Thread):
                         content = content_arr[2]
                         time_to_wait = len(content) // 5 + 1 
                         self.bot.addReaction(channelID, messageID, '💬') 
-                        t = Thread(target=imit, args=(channel, time_to_wait))
+                        t = Thread(target=self._imit, args=(channel, time_to_wait))
                         t.start()
                         t.join()
                         self.bot.sendMessage(channel, content)
@@ -200,7 +204,7 @@ class Logger(Thread):
                             content = extra_arr[1]
                         time_to_wait = len(content) // 5 + 1 
                         self.bot.addReaction(channelID, messageID, '💬') 
-                        t = Thread(target=imit, args=(channel, time_to_wait))
+                        t = Thread(target=self._imit, args=(channel, time_to_wait))
                         t.start()
                         t.join()
                         self.bot.reply(channel, msg_id, content)
@@ -223,8 +227,55 @@ class Logger(Thread):
                             message = extra_arr[1]
                         self.bot.editMessage(channel, msg_id, message) 
                         self.bot.addReaction(channelID, messageID, '✅') 
-                    
-        def imit(channel, time_to_wait):
+
+        @self.bot.gateway.command
+        def into_file(resp):
+            if resp.event.message:
+                m = resp.parsed.auto()
+                channelID = m["channel_id"]  
+                messageID = m["id"]
+                content = m["content"].lower()
+                self_id = self.bot.gateway.session.user["id"]
+                himself = (m["author"]["id"] == self_id)
+
+                if channelID == self._log_channel and flag_permission_gl and not himself:
+                    content_arr = content.split(' ', 3)
+                    command = content_arr[0]
+                    filename = content_arr[1]
+                    file_height = int(content_arr[2])
+                    request = content_arr[3]
+
+                    if command == "оформить":
+                        self.bot.addReaction(channelID, messageID, '💬')
+                        num_processed = 0
+                        h_temp = file_height
+                        with open(filename, 'w', encoding="utf-8") as f:
+                            while num_processed < file_height:
+                                if h_temp >= 25:
+                                    diff = 25 
+                                else:
+                                    diff = h_temp
+                                h_temp -= diff
+                                try:
+                                    searchResponse = self.bot.searchMessages(channelID=self._log_channel, textSearch=request, afterNumResults=num_processed, limit=diff)
+                                    results = self.bot.filterSearchResults(searchResponse)
+                                except KeyError:
+                                    break
+                                for message in results:
+                                    to_input = message["content"]
+                                    to_input = to_input.replace('`', '')
+                                    to_input = to_input.replace('||', '')
+                                    f.write(to_input + '\n')
+                                num_processed += diff
+
+                        self.bot.sendFile(self._log_channel, filename, isurl=False)
+                        self.bot.addReaction(channelID, messageID, '✅')
+                        import os
+                        os.remove(filename)
+
+                            
+
+        def _imit(self, channel, time_to_wait):
             for counter in range(time_to_wait):
                 self.bot.typingAction(channel)
                 time.sleep(1)
